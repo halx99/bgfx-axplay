@@ -11,9 +11,10 @@
 cmake_minimum_required(VERSION 3.10.2) # version supported by android studio
 project(bgfx)
 cmake_policy(SET CMP0054 NEW)
+cmake_policy(SET CMP0079 NEW)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -125,6 +126,30 @@ endif()
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bx)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bimg)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/bgfx)
+
+if (BGFX_BUILD_EXAMPLES) 
+    # depends on axmol media engine
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/axme)
+
+	add_example(
+		axplay
+		DIRECTORIES
+		${CMAKE_CURRENT_LIST_DIR}/axplay
+    )
+	
+	file(TO_NATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}/axplay/axmol.png" AXPLAY_LOGO)
+	file(TO_NATIVE_PATH "${CMAKE_CURRENT_LIST_DIR}/axplay/1912x1080_hvc1.mp4" AXPLAY_SAMPLE_VIDEO)
+	configure_file("${CMAKE_CURRENT_LIST_DIR}/axplay/axplay.h.in" "${CMAKE_BINARY_DIR}/axplay/axplay.h" @ONLY)
+
+	target_include_directories(example-axplay 
+	    PRIVATE "${CMAKE_BINARY_DIR}/axplay" 
+	    PRIVATE "${CMAKE_CURRENT_LIST_DIR}/glm")
+	
+	target_link_libraries(example-axplay PUBLIC axme)
+	if(MSVC_IDE)
+	    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT example-axplay)
+	endif()
+endif()
 
 if(BGFX_INSTALL)
 	# Include module with fuction 'write_basic_package_version_file'
