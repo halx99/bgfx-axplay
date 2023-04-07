@@ -12,7 +12,6 @@
 #include "yasio/detail/byte_buffer.hpp"
 #include "glm/glm.hpp"
 
- //#include "ImGuiFileDialog/ImGuiFileDialogConfig.h"
 #include "ImGuiFileDialog/ImGuiFileDialog.h"
 #include "ImGuiFileDialog/CustomFont.h"
 
@@ -100,8 +99,8 @@ namespace
 
 	class ExampleHelloWorld : public entry::AppI
 	{
-		bgfx::VertexBufferHandle m_vbh;
-		bgfx::IndexBufferHandle m_ibh;
+		// bgfx::VertexBufferHandle m_vbh;
+		// bgfx::IndexBufferHandle m_ibh;
 		bgfx::ProgramHandle m_program;
 		bgfx::ProgramHandle m_programNV12;
 		bgfx::ProgramHandle m_programYUY2;
@@ -168,6 +167,7 @@ namespace
 			// Create vertex stream declaration.
 			PosTexColorVertex::init();
 
+#if 0
 			// Create static vertex buffer.
 			m_vbh = bgfx::createVertexBuffer(
 				// Static data can be passed with bgfx::makeRef
@@ -180,7 +180,7 @@ namespace
 				// Static data can be passed with bgfx::makeRef
 				bgfx::makeRef(s_triList, sizeof(s_triList))
 			);
-
+#endif
 
 			// Create program from shaders.
 			m_program = loadProgram("vs_sprite", "fs_sprite");
@@ -232,8 +232,8 @@ namespace
 		{
 			imguiDestroy();
 
-			bgfx::destroy(m_ibh);
-			bgfx::destroy(m_vbh);
+			// bgfx::destroy(m_ibh);
+			// bgfx::destroy(m_vbh);
 			bgfx::destroy(m_program);
 			if (bgfx::isValid(m_spriteTexture))
 				bgfx::destroy(m_spriteTexture);
@@ -355,7 +355,7 @@ namespace
 				}
 
 				if (ImGui::Button("Play default"))
-					m_me->Open(AXPLAY_SAMPLE_VIDEO);
+					m_me->Open("file://" AXPLAY_SAMPLE_VIDEO);
 
 				ImVec2 minSize = ImVec2(0, 0);
 				ImVec2 maxSize = ImVec2(FLT_MAX, FLT_MAX);
@@ -372,9 +372,11 @@ namespace
 					if (ImGuiFileDialog::Instance()->IsOk())
 					{
 						m_lastVideoDir = igfd->GetCurrentPath();
+						const auto fileUriPrefix = "file://"sv;
 						auto filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+						filePathName.insert(filePathName.begin(), fileUriPrefix.data(), fileUriPrefix.data() + fileUriPrefix.length());
 						if (!m_me->Open(filePathName))
-							m_me->Open(AXPLAY_SAMPLE_VIDEO);
+							m_me->Open("file://" AXPLAY_SAMPLE_VIDEO);
 					}
 					ImGuiFileDialog::Instance()->Close();
 				}
@@ -548,12 +550,6 @@ namespace
 
 				bgfx::setState(state);
 				bgfx::submit(0, *currProgram);
-			}
-			else {
-				bgfx::setVertexBuffer(0, m_vbh);
-				bgfx::setIndexBuffer(m_ibh);
-				bgfx::setState(BGFX_STATE_DEFAULT);
-				bgfx::submit(viewId, *currProgram);
 			}
 		}
 

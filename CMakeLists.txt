@@ -146,6 +146,8 @@ if (BGFX_BUILD_EXAMPLES)
 	    PRIVATE "${CMAKE_CURRENT_LIST_DIR}/glm")
 	
 	target_link_libraries(example-axplay PUBLIC axme)
+	set_target_properties(example-axplay PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/cmake/bgfx")
 	if(MSVC_IDE)
 	    set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT example-axplay)
 	endif()
